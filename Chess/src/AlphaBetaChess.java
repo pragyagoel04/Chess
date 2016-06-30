@@ -1,8 +1,8 @@
 import java.util.Arrays;
+import java.util.Scanner;
 
 //backGround details
 
-//import javax.swing.*;
 /**	{
  * small= black
  * capital= white
@@ -16,11 +16,10 @@ import java.util.Arrays;
  * 
  */
 
-
 public class AlphaBetaChess {
 	static String chessBoard[][]={
-			{" ","k","b","q","a","b","k","r"},
-			{"P","p","p","p","p","p","p","p"},
+			{"r","k","b","q","a","b","k","r"},
+			{"p","p","p","p","p","p","p","p"},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
 			{" "," "," "," "," "," "," "," "},
@@ -49,9 +48,10 @@ public class AlphaBetaChess {
 	}
 
 	static int kingPositionC = 0, kingPositionL = 0;
+	static int globalDepth=4;
 
 	public static void main(String[] args) throws Exception {
-
+		
 		//set king positions
 		while(!chessBoard[kingPositionC/8][kingPositionC%8].equals("A"))
 			kingPositionC++;
@@ -66,14 +66,15 @@ public class AlphaBetaChess {
 		printChessBoard();
 		System.out.println();
 		String moves = possibleMoves();
-		System.out.println("Total : " + moves.length()/5 + " : " + moves);
-		
-		makeMove("01kQP");
-		printChessBoard();
-		 System.out.println();
-		
-		undoMove("01kQP");
-		printChessBoard();
+		System.out.println(alphaBeta(globalDepth, Integer.MAX_VALUE, Integer.MIN_VALUE, "", 0));
+//		System.out.println("Total : " + moves.length()/5 + " : " + moves);
+//		
+////		makeMove("01kQP");
+////		printChessBoard();
+////		 System.out.println();
+////		
+////		undoMove("01kQP");
+////		printChessBoard();
 
 		/*
 		 * JFrame f=new JFrame("CHESS..!"); UserInterface ui=new
@@ -81,8 +82,75 @@ public class AlphaBetaChess {
 		 * f.add(ui); f.setSize(500,500); f.setVisible(true);
 		 */
 		
+		
 	}
 	
+	public static int rating(){
+		System.out.print("Whats the score: ");
+		Scanner sc=new Scanner(System.in);
+		return sc.nextInt();
+		
+		//return 0;
+	}
+	
+	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) throws Exception{
+		// return move and score eg. 1234b#####
+		//String list=possibleMoves();
+		String list="1";
+		if(depth==0 || list.length()==0){
+//			return move+(rating()*(player*2-1));
+			return move+rating();
+		}
+		list="";
+		System.out.println("How many moves are there: ");
+		Scanner sc=new Scanner(System.in);
+		int temp=sc.nextInt();
+		for(int i=0;i<temp;i++){
+			list+="1111b";
+		}
+		
+		// sort later
+		player=1-player;
+		for(int i=0;i<list.length();i+=5){
+			makeMove(list.substring(i,i+5));
+			flipBoard();
+			String returnString=alphaBeta(depth-1, beta, alpha, list.substring(i,i+5), player);
+			int value=Integer.valueOf(returnString.substring(5));
+			flipBoard();
+			undoMove(list.substring(i,i+5));
+			if(player==0){
+				if(value<=beta){
+					beta=value;
+					if(depth==globalDepth){
+						move=returnString.substring(0, 5);
+					}
+				}	
+			} else{
+				if(value>alpha){
+					alpha=value;
+					if(depth==globalDepth){
+						move=returnString.substring(0,5);
+					}
+				}
+			}
+			if(alpha>=beta){
+				if(player == 0)
+					return move+beta;
+				else
+					return move+alpha;
+			}
+		}
+		
+		if(player == 0)
+			return move+beta;
+		else
+			return move+alpha;
+		
+	}
+	
+	public static void flipBoard(){
+		// TODO
+	}
 	public static void makeMove(String move){
 		
 		if(!(move.endsWith("P"))){
@@ -562,7 +630,7 @@ public class AlphaBetaChess {
 		// TODO Castling...! hate you..! unfair...!
 		return list.toString();
 	}
-
+	
 	private static boolean kingSafe() {
 
 		// checking for bishop and queen
