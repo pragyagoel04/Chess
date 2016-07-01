@@ -51,64 +51,61 @@ public class AlphaBetaChess {
 	static int globalDepth=4;
 
 	public static void main(String[] args) throws Exception {
-		
+
 		//set king positions
 		while(!chessBoard[kingPositionC/8][kingPositionC%8].equals("A"))
 			kingPositionC++;
 		while(!chessBoard[kingPositionL/8][kingPositionL%8].equals("a"))
 			kingPositionL++;
 
-		for(int i=0;i<8;i++){
-			for(int j=0;j<8;j++){
-				chessBoardCopy[i][j] = chessBoard[i][j];
-			}
-		}
+//		for(int i=0;i<8;i++){
+//			for(int j=0;j<8;j++){
+//				chessBoardCopy[i][j] = chessBoard[i][j];
+//			}
+//		}
 		printChessBoard();
-		System.out.println();
-		String moves = possibleMoves();
-		System.out.println(alphaBeta(globalDepth, Integer.MAX_VALUE, Integer.MIN_VALUE, "", 0));
-//		System.out.println("Total : " + moves.length()/5 + " : " + moves);
-//		
-////		makeMove("01kQP");
-////		printChessBoard();
-////		 System.out.println();
-////		
-////		undoMove("01kQP");
-////		printChessBoard();
+		System.out.println(possibleMoves());
+		//String moves = possibleMoves();
+		makeMove(alphaBeta(globalDepth, 1000000, -1000000, "", 0));
+		//		System.out.println("Total : " + moves.length()/5 + " : " + moves);
+		//		
+		makeMove("7655 ");
+		//undoMove("7655 ");
+		////		printChessBoard();
 
 		/*
 		 * JFrame f=new JFrame("CHESS..!"); UserInterface ui=new
 		 * UserInterface(); f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		 * f.add(ui); f.setSize(500,500); f.setVisible(true);
 		 */
-		
-		
+
+
 	}
-	
+
 	public static int rating(){
-		System.out.print("Whats the score: ");
-		Scanner sc=new Scanner(System.in);
-		return sc.nextInt();
-		
-		//return 0;
+//		System.out.print("Whats the score: ");
+//		Scanner sc=new Scanner(System.in);
+//		return sc.nextInt();
+
+		return 0;
 	}
-	
+
 	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) throws Exception{
 		// return move and score eg. 1234b#####
-		//String list=possibleMoves();
-		String list="1";
+		String list=possibleMoves();
+		//String list="1";
 		if(depth==0 || list.length()==0){
-//			return move+(rating()*(player*2-1));
-			return move+rating();
+			return move+(rating()*(player*2-1));
+			//return move+rating();
 		}
-		list="";
-		System.out.println("How many moves are there: ");
-		Scanner sc=new Scanner(System.in);
-		int temp=sc.nextInt();
-		for(int i=0;i<temp;i++){
-			list+="1111b";
-		}
-		
+//		list="";
+//		System.out.println("How many moves are there: ");
+//		Scanner sc=new Scanner(System.in);
+//		int temp=sc.nextInt();
+//		for(int i=0;i<temp;i++){
+//			list+="1111b";
+//		}
+
 		// sort later
 		player=1-player;
 		for(int i=0;i<list.length();i+=5){
@@ -140,43 +137,72 @@ public class AlphaBetaChess {
 					return move+alpha;
 			}
 		}
-		
+
 		if(player == 0)
 			return move+beta;
 		else
 			return move+alpha;
-		
+
 	}
-	
+
 	public static void flipBoard(){
-		// TODO
+		// swaps capitols with small and vice versa
+		String temp;
+		for(int i=0;i<32;i++){
+			int r=i/8, c=i%8;
+			if(Character.isUpperCase(chessBoard[r][c].charAt(0))){
+				temp=chessBoard[r][c].toLowerCase();
+			} else{
+				temp=chessBoard[r][c].toUpperCase();
+			}
+			if(Character.isUpperCase(chessBoard[7-r][7-c].charAt(0))){
+				chessBoard[r][c]=chessBoard[7-r][7-c].toLowerCase();
+			} else{
+				chessBoard[r][c]=chessBoard[7-r][7-c].toUpperCase();
+			}
+			chessBoard[7-r][7-c]=temp;
+		}
+		int kingTemp=kingPositionC;
+		kingPositionC=63-kingPositionL;
+		kingPositionL=63-kingTemp;
 	}
+
 	public static void makeMove(String move){
-		
+
 		if(!(move.endsWith("P"))){
 			// example move = "6040 "
 			// non promotion move
 			//r1,c1,r2,c2,oldPiece
-			
+
 			chessBoard[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] = chessBoard[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))];
 			chessBoard[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))] = " ";
+
+			if("A".equals(chessBoard[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))])){
+				kingPositionC=8*Character.getNumericValue(move.charAt(2))+Character.getNumericValue(move.charAt(3));
+			}
 		}
+
 		else{
 			// promotional move
 			//c1,c2,oldpiece,newpiece,P
-			chessBoard[0][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(3));
 			chessBoard[1][Character.getNumericValue(move.charAt(0))]=" ";
+			chessBoard[0][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(3));
 		}
 	}
-	
+
+
 	public static void undoMove(String move){
 		if(!(move.endsWith("P"))){
 			// example move = "6040 "
 			// non promotion move
 			//r1,c1,r2,c2,oldPiece
-			
+
 			chessBoard[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))] = chessBoard[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))];
 			chessBoard[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] = String.valueOf(move.charAt(4));
+			
+			if("A".equals(chessBoard[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))])){
+				kingPositionC=8*Character.getNumericValue(move.charAt(0))+Character.getNumericValue(move.charAt(1));
+			}
 		}
 		else{
 			// promotional move
@@ -184,7 +210,7 @@ public class AlphaBetaChess {
 			chessBoard[1][Character.getNumericValue(move.charAt(0))]="P";
 			chessBoard[0][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(2));
 		}
-		
+
 	}
 
 	public static String possibleMoves() throws Exception {
@@ -605,7 +631,6 @@ public class AlphaBetaChess {
 					if (Character.isLowerCase(chessBoard[r - 1 + j / 3][c - 1 + j % 3].charAt(0))
 							|| " ".equals(chessBoard[r - 1 + j / 3][c - 1 + j % 3])) {
 						oldPiece = chessBoard[r - 1 + j / 3][c - 1 + j % 3];
-						//						System.out.println((r - 1 + j / 3) + "," + (c - 1 + j % 3) + " : " + oldPiece);
 						chessBoard[r - 1 + j / 3][c - 1 + j % 3] = chessBoard[r][c];
 						chessBoard[r][c] = " ";
 						int kingTemp = kingPositionC;
@@ -630,7 +655,7 @@ public class AlphaBetaChess {
 		// TODO Castling...! hate you..! unfair...!
 		return list.toString();
 	}
-	
+
 	private static boolean kingSafe() {
 
 		// checking for bishop and queen
