@@ -4,7 +4,9 @@ import java.awt.event.*;
 
 public class UserInterface extends JPanel implements MouseListener, MouseMotionListener {
 	private static final long serialVersionUID = 1L;
-	static int x = 0, y = 0;
+	//mouseX, mouseY is where we click down
+	//newMouseX, newMouseY is where we release
+	static int mouseX, mouseY, newMouseY, newMouseX;
 	static int squareSize=32;	//to change the size of chess board when we change size of window
 	@Override
 	public void paintComponent(Graphics g) {
@@ -105,17 +107,45 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		// TODO Auto-generated method stub
-
+		if(e.getX()<8*squareSize && e.getY()<8*squareSize){
+			// if inside the board, not yellow area
+			mouseX=e.getX();
+			mouseY=e.getY();
+			repaint();
+		}
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+		if(e.getX()<8*squareSize && e.getY()<8*squareSize){
+			// if inside the board, not yellow area
+			newMouseX=e.getX();
+			newMouseY=e.getY();
+			if(e.getButton()==MouseEvent.BUTTON1){
+				String dragMove;
+				if(newMouseY/squareSize==0 && mouseY/squareSize==1 && "P".equals(AlphaBetaChess.chessBoard[mouseY/squareSize][mouseX/squareSize])){
+					//pawn promotion...
+					 dragMove=""+mouseX/squareSize+newMouseX/squareSize+AlphaBetaChess.chessBoard[newMouseY/squareSize][newMouseX/squareSize]+"QP";
 
+				}else{
+					// regular move...
+					 dragMove=""+mouseY/squareSize+mouseX/squareSize+newMouseY/squareSize+newMouseX/squareSize+AlphaBetaChess.chessBoard[newMouseY/squareSize][newMouseX/squareSize];
+
+				}
+				String userPossibilities=AlphaBetaChess.possibleMoves();
+				if(userPossibilities.contains(dragMove)){
+					//if valid move
+					AlphaBetaChess.makeMove(dragMove);
+					AlphaBetaChess.flipBoard();
+					AlphaBetaChess.makeMove(AlphaBetaChess.alphaBeta(AlphaBetaChess.globalDepth, Integer.MAX_VALUE, Integer.MIN_VALUE, "", 0));
+					AlphaBetaChess.flipBoard();
+					repaint();
+				}
+			}			
+		}
 	}
 
-	@Override
+	@Override 
 	public void mouseEntered(MouseEvent e) {
 		// TODO Auto-generated method stub
 
@@ -130,8 +160,6 @@ public class UserInterface extends JPanel implements MouseListener, MouseMotionL
 	@Override
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
-		x = e.getX();
-		y = e.getY();
-		repaint();
+	
 	}
 }

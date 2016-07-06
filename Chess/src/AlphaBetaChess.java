@@ -48,6 +48,8 @@ public class AlphaBetaChess {
 	}
 
 	static int kingPositionC = 0, kingPositionL = 0;
+	//1= human as white, 0= human as black 
+	static int humanAsWhite=-1;
 	static int globalDepth=4;
 
 	public static void main(String[] args) throws Exception {
@@ -64,22 +66,25 @@ public class AlphaBetaChess {
 				chessBoardCopy[i][j] = chessBoard[i][j];
 			}
 		}
+		JFrame f=new JFrame("CHESS..!"); UserInterface ui=new UserInterface(); 
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		f.add(ui);
+		f.setSize(400,400); 
+		f.setVisible(true);
 		printChessBoard();
-		//String moves = possibleMoves();
 		System.out.println(possibleMoves());
-		
-		makeMove(alphaBeta(globalDepth, Integer.MAX_VALUE, Integer.MIN_VALUE, "", 0));
+		Object[] option={"Computer", "Human"};
+		humanAsWhite=JOptionPane.showOptionDialog(null, "Who should play as white?", "ABC Options", JOptionPane.YES_NO_OPTION,
+				JOptionPane.QUESTION_MESSAGE, null, option, option[1]);
+		if(humanAsWhite==0){
+			makeMove(alphaBeta(globalDepth, Integer.MAX_VALUE, Integer.MIN_VALUE, "", 0));
+			flipBoard();
+			f.repaint();
+		}
+		//printChessBoard();
 		//makeMove(7655 );
-		
+		//undoMove(7655 );
 		//System.out.println("Total : " + moves.length()/5 + " : " + moves);
-
-		//		JFrame f=new JFrame("CHESS..!"); UserInterface ui=new UserInterface(); 
-		//		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		//		f.add(ui);
-		//		f.setSize(500,500); 
-		//		f.setVisible(true);
-
-
 
 	}
 
@@ -91,7 +96,7 @@ public class AlphaBetaChess {
 		return 0;
 	}
 
-	public static String alphaBeta(int depth, int beta, int alpha, String move, int player) throws Exception{
+	public static String alphaBeta(int depth, int beta, int alpha, String move, int player){
 		// return move and score eg. 1234b#####
 		String list=possibleMoves();
 		//String list="1";
@@ -176,7 +181,6 @@ public class AlphaBetaChess {
 			//r1,c1,r2,c2,oldPiece
 			chessBoard[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))] = chessBoard[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))];
 			chessBoard[Character.getNumericValue(move.charAt(0))][Character.getNumericValue(move.charAt(1))] = " ";
-
 			if("A".equals(chessBoard[Character.getNumericValue(move.charAt(2))][Character.getNumericValue(move.charAt(3))])){
 				kingPositionC=8*Character.getNumericValue(move.charAt(2))+Character.getNumericValue(move.charAt(3));
 			}
@@ -190,7 +194,6 @@ public class AlphaBetaChess {
 			chessBoard[0][Character.getNumericValue(move.charAt(1))]=String.valueOf(move.charAt(3));
 		}
 	}
-
 
 	public static void undoMove(String move){
 		if(!(move.endsWith("P"))){
@@ -214,7 +217,7 @@ public class AlphaBetaChess {
 
 	}
 
-	public static String possibleMoves() throws Exception {
+	public static String possibleMoves()  {
 
 		StringBuilder list = new StringBuilder();
 		String temp="";
@@ -460,7 +463,7 @@ public class AlphaBetaChess {
 		return list.toString();
 	}
 
-	private static Object possibleB(int i) throws Exception {
+	private static Object possibleB(int i)  {
 		StringBuilder list = new StringBuilder();
 		String oldPiece;
 		int r = i / 8, c = i % 8;
