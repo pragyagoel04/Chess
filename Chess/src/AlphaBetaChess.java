@@ -88,20 +88,12 @@ public class AlphaBetaChess {
 
 	}
 
-	public static int rating(){
-		//		System.out.print("Whats the score: ");
-		//		Scanner sc=new Scanner(System.in);
-		//		return sc.nextInt();
-
-		return 0;
-	}
-
 	public static String alphaBeta(int depth, int beta, int alpha, String move, int player){
 		// return move and score eg. 1234b#####
 		String list=possibleMoves();
 		//String list="1";
 		if(depth==0 || list.length()==0){
-			return move+(rating()*(player*2-1));
+			return move+(Rating.rating()*(player*2-1));
 			//return move+rating();
 		}
 		//		list="";
